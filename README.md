@@ -21,3 +21,5 @@ public:
 
 }
 ```
+
+To change the default size and default re-allocation size redefine `DEE_HASHMAP_INITIAL_SIZE`

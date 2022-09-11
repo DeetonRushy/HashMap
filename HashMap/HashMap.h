@@ -124,7 +124,7 @@ namespace Dee {
             KeyMap& ref = m_index_info[i];
 
             m_free_cells.push_back(ref.index);
-            ::memset((m_values + (ref.index * sizeof(Value))), 0, sizeof(Value));
+            ::memset((m_values + (ref.index)), 0, sizeof(Value));
 
             ref.hash = 0;
             ref.index = 0;

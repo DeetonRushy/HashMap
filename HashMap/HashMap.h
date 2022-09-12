@@ -66,7 +66,7 @@ namespace Dee {
             throw out_of_memory();
         }
         void log(const char* msg, ...) {
-#if defined (_DEBUG)
+#if defined (__)
             va_list args;
             __crt_va_start(args, msg);
             vfprintf(stderr, msg, args);

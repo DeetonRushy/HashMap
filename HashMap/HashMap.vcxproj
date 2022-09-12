@@ -131,9 +131,11 @@
   <ItemGroup>
     <ClInclude Include="Hash.h" />
     <ClInclude Include="HashMap.h" />
+    <ClInclude Include="LockedItem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HashMap.cpp" />
+    <ClCompile Include="LockedItem.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

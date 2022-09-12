@@ -65,6 +65,14 @@ namespace Dee {
             fprintf(stderr, "Failed to allocate! - %s", msg);
             throw out_of_memory();
         }
+        void log(const char* msg, ...) {
+#if defined (_DEBUG)
+            va_list args;
+            __crt_va_start(args, msg);
+            vfprintf(stderr, msg, args);
+            __crt_va_end(args);
+#endif
+        }
     };
 
     template<class Key, class Value>
@@ -103,8 +111,10 @@ namespace Dee {
             m_free_cells.erase(std::next(m_free_cells.begin()));
             index = free_cell;
             reused = true;
+            log("re-using old cell at index %zu\n", index);
         }
         else {
+            log("no free'd cells, using new cell at %zu\n", m_count);
             index = m_count;
         }
 
@@ -119,13 +129,20 @@ namespace Dee {
     template<class Key, class Value>
     inline void HashMap<Key, Value>::remove(Key const& key)
     {
+        if (m_count == 0) {
+            return;
+        }
+
         const size_t hash = Hash<Key>().compute(key);
         for (int i = 0; i < m_allocated_cells; ++i) {
             KeyMap& ref = m_index_info[i];
 
-            m_free_cells.push_back(ref.index);
-            ::memset((m_values + (ref.index)), 0, sizeof(Value));
+            if (ref.hash != hash)
+                continue;
 
+            log("position %zu is being cleaned up", ref.index);
+
+            m_free_cells.push_back(ref.index);
             ref.hash = 0;
             ref.index = 0;
         }
@@ -176,6 +193,10 @@ namespace Dee {
         // 4 allocations away from being fucked...
         if ((m_count - m_free_cells.size()) >= (m_allocated_cells - 4)) {
             // YES
+            log("moving info: Old: 0x%p, 0x%p\n",
+                m_values,
+                m_index_info);
+
             auto* temp_values = static_cast<Value*>(::malloc(m_count * sizeof(Value)));
             if (!temp_values) {
                 panic("failed to allocate memory for relocation");
@@ -210,6 +231,10 @@ namespace Dee {
 
             ::free(temp_values);
             ::free(temp_keymap);
+
+            log("moved values & index info! New: 0x%p, 0x%p\n",
+                m_values,
+                m_index_info);
         }
 
         return;
